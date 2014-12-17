@@ -1,0 +1,83 @@
+#####################
+#   LESSON No. 1    #    
+#####################
+
+# Welcome to Elasticsearch Demo
+
+# We prepared this short practical demo so that you can
+# learn how to interact with Elasticsearch
+# You will start with basic operations and continue
+# all the way to advanced queries
+
+# So without further delay... begin your first lesson
+
+# First, let us recapitulate the concepts. With Elasticsearch
+# you use simple HTTP requests to perform operations
+# So you can use our familiar GET, POST, PUT, DELETE
+# requests. As arguments you specify the name of index
+# (database), the name of type (table) and optional id
+
+# Note. If you are using marvel javascript console you can
+# benefit from usual code completions (TAB / CTRL + SPACE)
+
+# 1
+# Lets begin with the basics
+# Create your first document
+# Id will be generated for you (check the "_id" field in response)
+POST /demo/jcechace/
+{
+  "uco": "373775",
+  "name": "Jakub Cechacek",
+  "age": 24,
+  "interests": ["nosql", "books"]
+}
+
+# 2
+# Now try to retrieve your document 
+# Use the id from previous response
+GET /demo/jcechace/AUpKAS6dTbAZCd3OSlX7
+
+# 3
+# Create another document
+# This time specify its ID=1
+POST /demo/jcechace/1
+{
+  "uco": "373775",
+  "name": "Jakub Cechacek",
+  "age": 24,
+  "interests": ["nosql", "books"]
+}
+
+# Retrieve by id
+GET  /demo/jcechace/1
+
+# 4
+# Let’s add address as nested document
+PUT /demo/jcechace/1
+{
+  "uco": "373775",
+  "name": "Jakub Cechacek",
+  "age": 24,
+  "interests": ["nosql", "books"],
+  "address": {
+      "city": "Brno",
+      "street": "Merhautova",
+      "number": 165
+  } 
+}
+
+# Check your updated document again
+GET /demo/jcechace/1
+
+# 5
+# Delete your document
+DELETE /demo/jcechace/1
+
+# Check that the document was deleted
+GET /demo/jcechace/1
+
+# Well done
+
+# You have taken your first few steps towards mastering
+# Elasticsearch. You can continue to play around in your
+# sandbox or carry on with Lesson 2

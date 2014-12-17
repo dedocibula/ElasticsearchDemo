@@ -1,0 +1,7 @@
+.emphasized {
+  color: cadetblue !important;
+}
+
+.min-button {
+	min-width: 375px;
+}

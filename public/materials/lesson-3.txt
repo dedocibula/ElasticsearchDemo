@@ -1,0 +1,123 @@
+#####################
+#   LESSON No. 3    #    
+#####################
+
+# So you made it this far, congrats
+# In this lesson we will focus on some more fancy
+# features as are mere searches
+# We will have a look at aggregation framework
+# and some highlighting
+
+# Once again, you will be using Stack Overflow
+
+# 1
+# Lets start with aggregating answers by their ratings
+# Note that result size is 0. We don't want to display
+# results, just aggregations
+GET /dba/answer/_search
+{
+  "size": 0, 
+  "aggs": {
+    "ratings": {
+      "terms": {
+        "field": "rating"
+      }
+    }
+  }
+}
+
+# 2
+# You can naturally combine aggregations with queries
+GET /dba/answer/_search
+{
+  "size": 0,
+  "query": {
+    "query_string": {
+      "query": "python OR ruby"
+    }
+  },
+  "aggs": {
+    "ratings": {
+      "terms": {
+        "field": "rating"
+      }
+    }
+  }
+}
+
+# 3
+# Now let's do something more advanced - like nested
+# aggregations. Let's try aggregating questions by tags
+# and for each value let's calculate average rating
+GET /dba/question/_search
+{
+  "size": 0,
+  "aggs": {
+    "tags": {
+      "terms": {
+        "field": "tags"
+      }, 
+      "aggs": {
+        "rating": {
+          "avg": {
+            "field": "rating"
+          }
+        }
+      }
+    }
+  }
+}
+
+# 4
+# Great. Now let us aggregate question by tags while
+# displaying number of comments for each "bucket"
+GET /dba/question/_search
+{
+  "size": 0,
+  "aggs": {
+    "tags": {
+      "terms": {
+        "field": "tags"
+      }, 
+      "aggs": {
+        "nested": {
+          "nested": {
+            "path": "comments"
+          }
+        }
+      }
+    }
+  }
+}
+
+# 5
+# The last thing we want to show you is highlighting
+# Sometimes, we want elasticseach to let us know
+# why particular query has been highlighted
+# For this purpose we can use highlight keyword that
+# essentially adds new field to our result set with
+# matched keywords in bold. Try this example and look
+# for highlight attribute
+GET /dba/answer/_search
+{
+  "query": {
+    "match": {
+      "body": {
+        "query": "uninstall windows", 
+        "operator": "and"
+      }
+    }
+  },
+  "highlight": {
+    "fields": {
+      "body": {}
+    }
+  }
+}
+
+# Congratulations
+
+# You have reached the end of our lessons. Now you
+# know enough to experiment with ES and to further
+# your knowledge even more. 
+# Thanks again for your attention

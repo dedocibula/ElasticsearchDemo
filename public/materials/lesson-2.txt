@@ -1,0 +1,176 @@
+#####################
+#   LESSON No. 2    #    
+#####################
+
+# In this lesson you will take advantage of vast
+# ES searching api
+
+# We have already prepared your indexes and sample
+# commands for you. You will be querying very popular
+# question and answer site - Stack Overflow
+
+# Anyway, go ahead and begin your lessons
+
+# 1
+# Let's start simple. Let's first display the data in our 
+# index to get an idea what are we dealing with
+# Try displaying first 10 entries question type
+GET /dba/question/_search
+
+# 2
+# Now try displaying firs 10 entries in answer type
+# Use the id from previous response
+GET /dba/answer/_search
+
+# 3
+# Ok that's kinda boring. Let's try query-search.
+# Go ahead and only display those questions whose
+# title contains elasticsearch keyword
+# This time specify its ID=1
+GET /dba/question/_search?q=title:elasticsearch
+
+# Great. Let's try more advanced query-search.
+# Try searching for those entries with title containing
+# elasticsearch or or mentioning nosql
+GET /dba/question/_search
+{
+  "query": {
+    "query_string": {
+      "query": "nosql OR title:elasticsearch"
+    }
+  }
+}
+
+# 4
+# Now, let's query first 10 questions for author Lucas
+GET /dba/question/_search
+{
+  "query": {
+    "match": {
+      "author.name": "Lucas"
+    }
+  }
+}
+
+# 5
+# Searching is nice but sometimes we need to filter the 
+# data. Elasticsearch allows us to do just that.
+# Try finding 10 questions that contain words C# and t-sql
+# in them and have rating superior to 5
+GET /dba/question/_search
+{
+  "query": {
+    "filtered": {
+      "query": {
+        "match": {
+          "body": {
+            "query": "c# t-sql",
+            "operator": "and"
+          }
+        }
+      },
+      "filter": {
+        "range": {
+          "rating": {
+            "gt": 5
+          }
+        }
+      }
+    }
+  }
+}
+
+# 6
+# Cool right? Let's do more. We want to try searching
+# all the questions that are related to nosql databases
+# However, we only want those requests that are younger
+# than 1 year. Also, we would like to sort these by 
+# priority. This means that if NoSQL database appear in
+# tags they have the highest priority. If they appear in 
+# title the priority is second highest. I think have the
+# idea...
+GET /dba/question/_search
+{
+  "query": {
+    "filtered": {
+      "query": {
+        "multi_match": {
+          "query": "NoSQL databases",
+          "fields": ["tags^10", "title^5", "_all"]
+        }
+      },
+      "filter": {
+        "range": {
+          "creation_date": {
+            "gt" : "now-1y"
+          }
+        }
+      }
+    }
+  }
+}
+
+# 7
+# Our types have parent <-> child relationship. This
+# means that each question has 0 to many answers
+# The following query allows you to display 10 answers
+# whose parent (question) contains python in title
+GET dba/answer/_search
+{
+  "fields": ["_parent", "_source"], 
+  "query": {
+    "has_parent": {
+      "parent_type": "question",
+      "query": {
+        "match": {
+          "title": "python"
+        }
+      }
+    }
+  }
+}
+
+
+# 8
+# Searching for nested documents requires that you
+# inform Elasticsearch to treat the document as nested
+# This example filters all the documents containing
+# comments from user Mat
+GET /dba/question/_search
+{
+  "query": {
+    "filtered": {
+      "query": {"match_all": {}},
+      "filter": {
+        "nested": {
+          "path": "comments",
+          "query": {
+            "match": {
+              "comments.author.name": "Mat"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# 9
+# The last thing we want to show you is matching phrases
+# The query is basically the same with one notable
+# exception. We only display those questions whose body
+# contains the phrase exactly as given.
+GET /dba/question/_search
+{
+  "query": {
+    "match_phrase": {
+      "body": "SELECT ... WHERE"
+    }
+  }
+}
+
+# Well done
+
+# Now you know how to run some pretty cool queries. Once
+# again, feel free to stay and experiment or carry on
+# to another lesson
