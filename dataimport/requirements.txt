@@ -1,0 +1,8 @@
+SQLAlchemy==0.9.8
+elasticsearch==1.2.0
+gnureadline==6.3.3
+ipython==2.3.1
+lxml==3.4.1
+six==1.8.0
+urllib3==1.9.1
+yolk3k==0.8.6
