@@ -24,57 +24,57 @@
 # Lets begin with the basics
 # Create your first document
 # Id will be generated for you (check the "_id" field in response)
-POST /demo/jcechace/
+POST /demo/<put your last name here>/
 {
-  "uco": "373775",
-  "name": "Jakub Cechacek",
-  "age": 24,
-  "interests": ["nosql", "books"]
+  "uco": "<your uco>",
+  "name": "<your name>",
+  "age": <your age>,
+  "interests": ["nosql", "elasticsearch"]
 }
 
 # 2
 # Now try to retrieve your document 
 # Use the id from previous response
-GET /demo/jcechace/AUpKAS6dTbAZCd3OSlX7
+GET /demo/<put your last name here>/<id from previous response>
 
 # 3
 # Create another document
 # This time specify its ID=1
-POST /demo/jcechace/1
+POST /demo/<put your last name here>/1
 {
-  "uco": "373775",
-  "name": "Jakub Cechacek",
-  "age": 24,
-  "interests": ["nosql", "books"]
+  "uco": "<your uco>",
+  "name": "<your name>",
+  "age": <your age>,
+  "interests": ["nosql", "elasticsearch"]
 }
 
 # Retrieve by id
-GET  /demo/jcechace/1
+GET  /demo/<put your last name here>/1
 
 # 4
 # Let’s add address as nested document
-PUT /demo/jcechace/1
+PUT /demo/<put your last name here>/1
 {
-  "uco": "373775",
-  "name": "Jakub Cechacek",
-  "age": 24,
-  "interests": ["nosql", "books"],
+  "uco": "<your uco>",
+  "name": "<your name>",
+  "age": <your age>,
+  "interests": ["nosql", "elasticsearch"],
   "address": {
-      "city": "Brno",
-      "street": "Merhautova",
-      "number": 165
+      "city": "<your address>",
+      "street": "<your address>",
+      "number": <your address number>
   } 
 }
 
 # Check your updated document again
-GET /demo/jcechace/1
+GET /demo/<put your last name here>/1
 
 # 5
 # Delete your document
-DELETE /demo/jcechace/1
+DELETE /demo/<put your last name here>/1
 
 # Check that the document was deleted
-GET /demo/jcechace/1
+GET /demo/<put your last name here>/1
 
 # Well done
 
