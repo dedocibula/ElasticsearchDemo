@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"ElasticsearchDemo/app/models"
+
 	"github.com/revel/revel"
 )
 
@@ -10,9 +11,11 @@ type App struct {
 }
 
 var rm = models.ResourceManager{}
+var lm = models.LessonManager{}
 
 func (c App) Index() revel.Result {
-	return c.Render()
+	lessons := lm.GenerateLessons()
+	return c.Render(lessons)
 }
 
 func (c App) Sense() revel.Result {
