@@ -5,9 +5,43 @@
 
   <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
-    <h1 class="emphasized">... Not ready quite yet</h1>
-    <div class="row text-center">
-      <img src="http://www.netanimations.net/under-construction-flashing-barracade-animation.gif" alt="Under Construction" />
+    <h1 class="emphasized">... It's time for a Quiz</h1>
+    <p>It is time for you to test what you have learnt. Don't worry, it is not going to be anything nefarious, but just in case you need help feel free to consult Elasticsearch documentation below.</p>
+    <p>The quiz will have you write a query and input your result to this page. Much like with the lessons you will be using <a class="emphasized" href="/App/Sense" target="_blank">Sense</a> to test your query and obtain result.</p>
+    <p>There is no time limit for this test but remember - other students will be solving it as well and only the fastest wins the prize (and eternal glory :).</p>
+    <p><b class="emphasized">Good luck and may the best win...</b><p>
+  </div>
+
+   <div class="page-header">
+    <h1 class="emphasized">Quiz</h1>
+  </div>
+  <div class="jumbotron">
+    <div class="row">
+      <div class="text-center">
+        <p>
+          Use <span class="emphasized">DBA</span> Elasticsearch index to answer the following question:
+        </p>
+      </div>
+    </div>
+    <div class="row">&nbsp;</div>
+    <div class="row">
+      <div class="text-center">
+      	<p class="question">
+      	  "What is the <b class="emphasized">ID</b> of the <span class="emphasized">first</span> author with a question under the tags <span class="emphasized">"oracle"</span> and <span class="emphasized">"performance"</span> with the rating equal <span class="emphasized">at least to 4</span> and with a comment from <span class="emphasized">"Mat"</span> ?"
+      	</p>
+      </div>
+    </div>
+    <div class="row">&nbsp;</div>
+    <div class="row">
+      <div class="text-center">
+        {{template "flash.html" .}}
+        <form action="" method="POST">
+          {{with $field := field "answer" .}}
+            <label class="emphasized" for="{{$field.Name}}">Your answer: </label>
+            <input type="number" name="{{$field.Name}}" value="{{$field.Flash}}" />
+          {{end}}
+        </form>
+      </div>
     </div>
   </div>
 

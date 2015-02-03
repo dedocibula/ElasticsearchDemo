@@ -5,3 +5,8 @@
 .min-button {
 	min-width: 375px;
 }
+
+.question {
+	font-style: italic;
+	font-size: 18px !important;
+}
