@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"ElasticsearchDemo/app/models"
+	"fmt"
 
 	"github.com/revel/revel"
 )
@@ -10,8 +11,10 @@ type App struct {
 	*revel.Controller
 }
 
-var rm = models.ResourceManager{}
-var lm = models.LessonManager{}
+var (
+	rm = models.ResourceManager{}
+	lm = models.LessonManager{}
+)
 
 func (c App) Index() revel.Result {
 	lessons := lm.GenerateLessons()
@@ -19,8 +22,11 @@ func (c App) Index() revel.Result {
 }
 
 func (c App) Sense() revel.Result {
-	address := rm.LoadESAddress() + rm.LoadESPort() + "/_plugin/marvel/sense/index.html"
-	return c.Redirect(address)
+	senseUrl := fmt.Sprintf("http://%s:%s/%s",
+		rm.GetELKAddress(),
+		rm.GetELKPort(),
+		rm.GetSenseUri())
+	return c.Redirect(senseUrl)
 }
 
 func (c App) Lesson(id int) revel.Result {

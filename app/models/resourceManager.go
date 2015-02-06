@@ -7,7 +7,15 @@ import (
 	"github.com/revel/revel"
 )
 
-type ResourceManager struct{}
+const (
+	elkAddressKey = "elk.address"
+	elkPortKey    = "elk.port"
+	senseUri      = "_plugin/marvel/sense/index.html"
+)
+
+type ResourceManager struct {
+	elkAddress, elkPort string
+}
 
 func (_ ResourceManager) LoadMaterial(materialId int) (string, error) {
 	dat, err := ioutil.ReadFile(
@@ -17,12 +25,24 @@ func (_ ResourceManager) LoadMaterial(materialId int) (string, error) {
 	return string(dat), err
 }
 
-func (_ ResourceManager) LoadESAddress() string {
-	return fmt.Sprintf("http://%s",
-		revel.Config.StringDefault("es.address", "localhost"))
+func (r *ResourceManager) GetELKAddress() string {
+	if r.elkAddress == "" {
+		r.elkAddress = r.loadFromConfig(elkAddressKey, "localhost")
+	}
+	return r.elkAddress
 }
 
-func (_ ResourceManager) LoadESPort() string {
-	return fmt.Sprintf(":%s",
-		revel.Config.StringDefault("es.port", "9200"))
+func (r *ResourceManager) GetELKPort() string {
+	if r.elkPort == "" {
+		r.elkPort = r.loadFromConfig(elkPortKey, "9200")
+	}
+	return r.elkPort
+}
+
+func (r *ResourceManager) GetSenseUri() string {
+	return senseUri
+}
+
+func (_ ResourceManager) loadFromConfig(key, defaultValue string) string {
+	return revel.Config.StringDefault(key, defaultValue)
 }
