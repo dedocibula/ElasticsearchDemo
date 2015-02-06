@@ -10,7 +10,6 @@ import (
 const (
 	elkAddressKey = "elk.address"
 	elkPortKey    = "elk.port"
-	senseUri      = "_plugin/marvel/sense/index.html"
 )
 
 type ResourceManager struct {
@@ -37,10 +36,6 @@ func (r *ResourceManager) GetELKPort() string {
 		r.elkPort = r.loadFromConfig(elkPortKey, "9200")
 	}
 	return r.elkPort
-}
-
-func (r *ResourceManager) GetSenseUri() string {
-	return senseUri
 }
 
 func (_ ResourceManager) loadFromConfig(key, defaultValue string) string {

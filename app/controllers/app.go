@@ -11,6 +11,8 @@ type App struct {
 	*revel.Controller
 }
 
+const SenseUri = "_plugin/marvel/sense/index.html"
+
 var (
 	rm = models.ResourceManager{}
 	lm = models.LessonManager{}
@@ -25,7 +27,7 @@ func (c App) Sense() revel.Result {
 	senseUrl := fmt.Sprintf("http://%s:%s/%s",
 		rm.GetELKAddress(),
 		rm.GetELKPort(),
-		rm.GetSenseUri())
+		SenseUri)
 	return c.Redirect(senseUrl)
 }
 
