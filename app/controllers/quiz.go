@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	em = models.ElasticManager{RM: &models.ResourceManager{}}
+	em = models.NewELKManager(models.NewResourceManager())
 )
 
 type Quiz struct {
@@ -19,7 +19,6 @@ func (c Quiz) Index() revel.Result {
 }
 
 func (c Quiz) Submit() revel.Result {
-	em.Initialize()
 	answer, err := em.LiteralQueryELK()
 	if err != nil {
 		c.Flash.Error(err.Error())

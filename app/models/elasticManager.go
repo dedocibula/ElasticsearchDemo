@@ -7,31 +7,22 @@ import (
 	"github.com/mattbaird/elastigo/lib"
 )
 
-type ElasticManager struct {
-	RM *ResourceManager
-
+type ELKManager struct {
+	rm   *ResourceManager
 	conn *elastigo.Conn
 }
 
-func (e *ElasticManager) Initialize() bool {
-	if e.RM == nil {
-		return false
-	}
-
-	if e.conn == nil {
-		c := elastigo.NewConn()
-		c.Domain = e.RM.GetELKAddress()
-		c.Port = e.RM.GetELKPort()
-
-		e.conn = c
-	}
-	return true
+func NewELKManager(rm *ResourceManager) *ELKManager {
+	return &ELKManager{rm: rm}
 }
 
-func (e *ElasticManager) LiteralQueryELK() (int, error) {
-	e.Initialize()
+func (e *ELKManager) LiteralQueryELK() (int, error) {
+	err := e.initialize()
+	if err != nil {
+		return -1, err
+	}
 
-	query, err := e.getQuizQuery()
+	query, err := e.rm.LoadQuizQuery()
 	if err != nil {
 		return -1, err
 	}
@@ -41,22 +32,30 @@ func (e *ElasticManager) LiteralQueryELK() (int, error) {
 		return -1, err
 	}
 
-	return e.parseQuizResult(result)
+	return e.parseQueryResult(result)
 }
 
-func (e *ElasticManager) Dispose() {
-	e.RM = nil
+func (e *ELKManager) Dispose() {
+	e.rm = nil
 	e.conn = nil
 }
 
-func (e ElasticManager) getQuizQuery() (string, error) {
-	if e.RM == nil {
-		return "", fmt.Errorf("ResourceManager isn't initialized")
+func (e *ELKManager) initialize() error {
+	if e.rm == nil {
+		return fmt.Errorf("ResourceManager isn't initialized")
 	}
-	return e.RM.LoadQuizQuery()
+
+	if e.conn == nil {
+		c := elastigo.NewConn()
+		c.Domain = e.rm.GetELKAddress()
+		c.Port = e.rm.GetELKPort()
+
+		e.conn = c
+	}
+	return nil
 }
 
-func (_ ElasticManager) parseQuizResult(result elastigo.SearchResult) (int, error) {
+func (_ ELKManager) parseQueryResult(result elastigo.SearchResult) (int, error) {
 	if len(result.Hits.Hits) == 1 {
 		var m map[string][]int
 		err := json.Unmarshal(*result.Hits.Hits[0].Fields, &m)

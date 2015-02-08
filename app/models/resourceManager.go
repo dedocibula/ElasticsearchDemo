@@ -16,6 +16,10 @@ type ResourceManager struct {
 	elkAddress, elkPort string
 }
 
+func NewResourceManager() *ResourceManager {
+	return &ResourceManager{}
+}
+
 func (_ ResourceManager) LoadMaterial(materialId int) (string, error) {
 	dat, err := ioutil.ReadFile(
 		fmt.Sprintf("%s/public/materials/lesson-%v.txt",

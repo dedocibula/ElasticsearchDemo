@@ -14,8 +14,8 @@ type App struct {
 const SenseUri = "_plugin/marvel/sense/index.html"
 
 var (
-	rm = models.ResourceManager{}
-	lm = models.LessonManager{}
+	rm = models.NewResourceManager()
+	lm = models.NewLessonManager()
 )
 
 func (c App) Index() revel.Result {
