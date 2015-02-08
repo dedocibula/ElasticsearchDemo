@@ -1,0 +1,39 @@
+{
+  "fields": ["author.id"],
+  "size": 1, 
+  "query": {
+    "filtered": {
+      "query": {
+        "match": {
+          "tags": {
+            "query": "oracle performance", 
+            "operator": "and"
+          }
+        }
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            { 
+              "nested": {
+                "path": "comments",
+                "query": {
+                  "match": {
+                    "comments.author.name": "Mat"
+                  }
+                }
+              }
+            }, 
+            {
+              "range": {
+                "rating": {
+                  "gt": 3
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

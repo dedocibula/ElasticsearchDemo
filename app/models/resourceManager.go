@@ -24,6 +24,13 @@ func (_ ResourceManager) LoadMaterial(materialId int) (string, error) {
 	return string(dat), err
 }
 
+func (_ ResourceManager) LoadQuizQuery() (string, error) {
+	dat, err := ioutil.ReadFile(
+		fmt.Sprintf("%s/public/materials/quiz.txt",
+			revel.BasePath))
+	return string(dat), err
+}
+
 func (r *ResourceManager) GetELKAddress() string {
 	if r.elkAddress == "" {
 		r.elkAddress = r.loadFromConfig(elkAddressKey, "localhost")
