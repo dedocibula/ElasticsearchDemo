@@ -1,6 +1,8 @@
 package models
 
 type Result struct {
+	Ok      bool
+	Message string
 }
 
 type QuizManager struct {
@@ -18,6 +20,22 @@ func (q *QuizManager) Dispose() {
 	q.em = nil
 }
 
-func (q QuizManager) Validate(answer int) {
-
+func (q QuizManager) Validate(answer int) Result {
+	result, err := q.em.LiteralQueryELK()
+	if err != nil {
+		return Result{
+			Ok:      false,
+			Message: err.Error(),
+		}
+	} else if result != answer {
+		return Result{
+			Ok:      false,
+			Message: "Sorry, your answer wasn't quite correct. Please try again.",
+		}
+	} else {
+		return Result{
+			Ok:      true,
+			Message: "That's the correct answer. Well done.",
+		}
+	}
 }
