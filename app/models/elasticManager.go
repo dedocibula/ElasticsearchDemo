@@ -16,6 +16,11 @@ func NewELKManager(rm *ResourceManager) *ELKManager {
 	return &ELKManager{rm: rm}
 }
 
+func (e *ELKManager) Dispose() {
+	e.rm = nil
+	e.conn = nil
+}
+
 func (e *ELKManager) LiteralQueryELK() (int, error) {
 	err := e.initialize()
 	if err != nil {
@@ -33,11 +38,6 @@ func (e *ELKManager) LiteralQueryELK() (int, error) {
 	}
 
 	return e.parseQueryResult(result)
-}
-
-func (e *ELKManager) Dispose() {
-	e.rm = nil
-	e.conn = nil
 }
 
 func (e *ELKManager) initialize() error {
