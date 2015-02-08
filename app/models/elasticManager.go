@@ -41,17 +41,7 @@ func (e *ElasticManager) LiteralQueryELK() (int, error) {
 		return -1, err
 	}
 
-	if len(result.Hits.Hits) == 1 {
-		var m map[string][]int
-		err = json.Unmarshal(*result.Hits.Hits[0].Fields, &m)
-		if err != nil {
-			return -1, err
-		}
-		return m["author.id"][0], nil
-	} else {
-		return -1, fmt.Errorf("Number of results expected: %v, got %v",
-			1, len(result.Hits.Hits))
-	}
+	return e.parseQuizResult(result)
 }
 
 func (e *ElasticManager) Dispose() {
@@ -64,4 +54,18 @@ func (e ElasticManager) getQuizQuery() (string, error) {
 		return "", fmt.Errorf("ResourceManager isn't initialized")
 	}
 	return e.RM.LoadQuizQuery()
+}
+
+func (_ ElasticManager) parseQuizResult(result elastigo.SearchResult) (int, error) {
+	if len(result.Hits.Hits) == 1 {
+		var m map[string][]int
+		err := json.Unmarshal(*result.Hits.Hits[0].Fields, &m)
+		if err != nil {
+			return -1, err
+		}
+		return m["author.id"][0], nil
+	} else {
+		return -1, fmt.Errorf("Number of results expected: %v, got %v",
+			1, len(result.Hits.Hits))
+	}
 }
