@@ -36,7 +36,12 @@
       <div class="text-center">
         {{template "flash.html" .}}
         <form action="/Quiz/Submit" method="POST">
-          {{with $field := field "answer" .}}
+          {{with $field := field "attempt.Name" .}}
+            <label class="emphasized" for="{{$field.Name}}">Your nick: </label>
+            <input class="answer" type="text" name="{{$field.Name}}" value="{{$field.Flash}}" 
+            />
+          {{end}}
+          {{with $field := field "attempt.Answer" .}}
             <label class="emphasized" for="{{$field.Name}}">Your answer: </label>
             <input class="answer" type="number" name="{{$field.Name}}" value="{{$field.Flash}}" 
             />

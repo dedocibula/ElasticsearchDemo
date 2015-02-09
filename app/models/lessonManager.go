@@ -1,11 +1,5 @@
 package models
 
-type Lesson struct {
-	Number      int
-	Description string
-	HtmlClass   string
-}
-
 type LessonManager struct {
 	lessons []Lesson
 }

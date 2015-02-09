@@ -1,14 +1,14 @@
 package models
 
 const (
-	index = "dba"
-	_type = "question"
+	index       = "dba"
+	quizType    = "question"
+	rankingType = "ranking"
 )
 
-type Result struct {
-	Ok      bool
-	Message string
-}
+var (
+	atomicCounter = 0
+)
 
 type QuizManager struct {
 	em *ELKManager
@@ -26,21 +26,20 @@ func (q *QuizManager) Dispose() {
 }
 
 func (q QuizManager) Validate(answer int) Result {
-	result, err := q.em.LiteralSearchELK(index, _type)
+	result, err := q.em.LiteralSearchELK(index, quizType)
 	if err != nil {
-		return Result{
-			Ok:      false,
-			Message: err.Error(),
-		}
+		return q.buildResult(false, err.Error())
 	} else if result != answer {
-		return Result{
-			Ok:      false,
-			Message: "Sorry, your answer wasn't quite correct. Please try again.",
-		}
+		return q.buildResult(false,
+			"Sorry, your answer wasn't quite correct. Please try again.")
 	} else {
-		return Result{
-			Ok:      true,
-			Message: "That's the correct answer. Well done.",
-		}
+		return q.buildResult(true, "That's the correct answer. Well done.")
+	}
+}
+
+func (q QuizManager) buildResult(correct bool, message string) Result {
+	return Result{
+		Ok:      correct,
+		Message: message,
 	}
 }

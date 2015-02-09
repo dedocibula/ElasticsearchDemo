@@ -45,6 +45,10 @@ func (e *ELKManager) LiteralSearchELK(index, _type string) (int, error) {
 	return e.parseQueryResult(result)
 }
 
+func (e *ELKManager) RecordSuccess() {
+
+}
+
 func (e *ELKManager) initialize() error {
 	if e.rm == nil {
 		return fmt.Errorf("ResourceManager isn't initialized")
