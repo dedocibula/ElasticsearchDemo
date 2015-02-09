@@ -21,8 +21,13 @@ func (e *ELKManager) Dispose() {
 	e.conn = nil
 }
 
-func (e *ELKManager) LiteralQueryELK() (int, error) {
-	err := e.initialize()
+func (e *ELKManager) LiteralSearchELK(index, _type string) (int, error) {
+	err := e.validateParams(index, _type)
+	if err != nil {
+		return -1, err
+	}
+
+	err = e.initialize()
 	if err != nil {
 		return -1, err
 	}
@@ -32,7 +37,7 @@ func (e *ELKManager) LiteralQueryELK() (int, error) {
 		return -1, err
 	}
 
-	result, err := e.conn.Search("dba", "question", nil, query)
+	result, err := e.conn.Search(index, _type, nil, query)
 	if err != nil {
 		return -1, err
 	}
@@ -51,6 +56,15 @@ func (e *ELKManager) initialize() error {
 		c.Port = e.rm.GetELKPort()
 
 		e.conn = c
+	}
+	return nil
+}
+
+func (_ ELKManager) validateParams(params ...string) error {
+	for _, param := range params {
+		if param == "" {
+			return fmt.Errorf("Given parameters cannot be empty: %v", params)
+		}
 	}
 	return nil
 }

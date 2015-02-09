@@ -1,5 +1,10 @@
 package models
 
+const (
+	index = "dba"
+	_type = "question"
+)
+
 type Result struct {
 	Ok      bool
 	Message string
@@ -21,7 +26,7 @@ func (q *QuizManager) Dispose() {
 }
 
 func (q QuizManager) Validate(answer int) Result {
-	result, err := q.em.LiteralQueryELK()
+	result, err := q.em.LiteralSearchELK(index, _type)
 	if err != nil {
 		return Result{
 			Ok:      false,
