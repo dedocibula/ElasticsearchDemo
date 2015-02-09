@@ -45,8 +45,9 @@ func (e *ELKManager) LiteralSearchELK(index, _type string) (int, error) {
 	return e.parseQueryResult(result)
 }
 
-func (e *ELKManager) RecordSuccess() {
-
+func (e ELKManager) RecordSuccess(index, _type string, player Player) error {
+	_, err := e.conn.Index(index, _type, "", nil, player)
+	return err
 }
 
 func (e *ELKManager) initialize() error {

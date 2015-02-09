@@ -7,7 +7,7 @@ const (
 )
 
 var (
-	atomicCounter = 0
+	atomicCounter = 1
 )
 
 type QuizManager struct {
