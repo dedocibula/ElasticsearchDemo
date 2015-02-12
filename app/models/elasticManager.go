@@ -45,8 +45,8 @@ func (e *ELKManager) LiteralSearchELK(index, _type string) (int, error) {
 	return e.parseQueryResult(result)
 }
 
-func (e ELKManager) RecordSuccess(index, _type string, player Player) error {
-	_, err := e.conn.Index(index, _type, "", nil, player)
+func (e ELKManager) RecordSuccessELK(index, _type string, player Player) error {
+	_, err := e.tryInsert(index, _type, player)
 	return err
 }
 
@@ -86,4 +86,20 @@ func (_ ELKManager) parseQueryResult(result elastigo.SearchResult) (int, error) 
 		return -1, fmt.Errorf("Number of results expected: %v, got %v",
 			1, len(result.Hits.Hits))
 	}
+}
+
+func (e ELKManager) tryInsert(index, _type string, player Player) (string, error) {
+	url := fmt.Sprintf("/%s/%s/id_%s", index, _type, player.Nickname)
+
+	body, err := e.conn.DoCommand("POST", url, nil, player)
+	if err != nil {
+		return "", err
+	}
+
+	var result string
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return "", err
+	}
+	return result, err
 }
