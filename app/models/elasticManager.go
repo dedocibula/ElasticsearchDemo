@@ -7,6 +7,8 @@ import (
 	"github.com/mattbaird/elastigo/lib"
 )
 
+const UIDPrefix = "UID_"
+
 type ELKManager struct {
 	rm   *ResourceManager
 	conn *elastigo.Conn
@@ -21,7 +23,7 @@ func (e *ELKManager) Dispose() {
 	e.conn = nil
 }
 
-func (e *ELKManager) LiteralSearchELK(index, _type string) (int, error) {
+func (e ELKManager) LiteralSearchELK(index, _type string) (int, error) {
 	err := e.validateParams(index, _type)
 	if err != nil {
 		return -1, err
@@ -43,6 +45,22 @@ func (e *ELKManager) LiteralSearchELK(index, _type string) (int, error) {
 	}
 
 	return e.parseQueryResult(result)
+}
+
+func (e ELKManager) ExistsRecordELK(index, _type string, record ELKRecord) (bool, error) {
+	err := e.validateParams(index, _type)
+	if err != nil {
+		return false, err
+	}
+
+	err = e.initialize()
+	if err != nil {
+		return false, err
+	}
+
+	id := fmt.Sprintf("%s%s", UIDPrefix, record.Nickname)
+
+	return e.conn.ExistsBool(index, _type, id, nil)
 }
 
 func (e ELKManager) RecordSuccessELK(index, _type string, record ELKRecord) error {
@@ -103,7 +121,7 @@ func (_ ELKManager) parseQueryResult(result elastigo.SearchResult) (int, error) 
 }
 
 func (e ELKManager) tryInsert(index, _type string, record ELKRecord) ([]byte, error) {
-	url := fmt.Sprintf("/%s/%s/UID_%s", index, _type, record.Nickname)
+	url := fmt.Sprintf("/%s/%s/%s%s", index, _type, UIDPrefix, record.Nickname)
 
 	return e.conn.DoCommand("POST", url, nil, record)
 }
