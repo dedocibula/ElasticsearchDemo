@@ -28,15 +28,15 @@ func (c Quiz) Submit(attempt models.Attempt) revel.Result {
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()
 	} else {
-		c.validateAnswer(attempt.Answer)
+		c.validateAttempt(attempt)
 	}
 	c.FlashParams()
 
 	return c.Redirect(Quiz.Index)
 }
 
-func (c Quiz) validateAnswer(answer int) {
-	result := qm.Validate(answer)
+func (c Quiz) validateAttempt(attempt models.Attempt) {
+	result := qm.Validate(attempt)
 	switch result.Ok {
 	case true:
 		c.Flash.Success(result.Message)

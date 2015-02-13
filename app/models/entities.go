@@ -1,5 +1,9 @@
 package models
 
+import (
+	"time"
+)
+
 type Lesson struct {
 	Number      int
 	Description string
@@ -11,9 +15,9 @@ type Result struct {
 	Message string
 }
 
-type Player struct {
-	Nickname string
-	Position int
+type ELKRecord struct {
+	Nickname  string
+	Timestamp time.Time
 }
 
 type Attempt struct {

@@ -45,9 +45,23 @@ func (e *ELKManager) LiteralSearchELK(index, _type string) (int, error) {
 	return e.parseQueryResult(result)
 }
 
-func (e ELKManager) RecordSuccessELK(index, _type string, player Player) error {
-	_, err := e.tryInsert(index, _type, player)
-	return err
+func (e ELKManager) RecordSuccessELK(index, _type string, record ELKRecord) error {
+	err := e.validateParams(index, _type)
+	if err != nil {
+		return err
+	}
+
+	err = e.initialize()
+	if err != nil {
+		return err
+	}
+
+	result, err := e.tryInsert(index, _type, record)
+	if err != nil {
+		return err
+	}
+
+	return e.verifySuccess(result)
 }
 
 func (e *ELKManager) initialize() error {
@@ -88,18 +102,23 @@ func (_ ELKManager) parseQueryResult(result elastigo.SearchResult) (int, error) 
 	}
 }
 
-func (e ELKManager) tryInsert(index, _type string, player Player) (string, error) {
-	url := fmt.Sprintf("/%s/%s/id_%s", index, _type, player.Nickname)
+func (e ELKManager) tryInsert(index, _type string, record ELKRecord) ([]byte, error) {
+	url := fmt.Sprintf("/%s/%s/UID_%s", index, _type, record.Nickname)
 
-	body, err := e.conn.DoCommand("POST", url, nil, player)
+	return e.conn.DoCommand("POST", url, nil, record)
+}
+
+func (e ELKManager) verifySuccess(result []byte) error {
+	var m map[string]interface{}
+	err := json.Unmarshal(result, &m)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	var result string
-	err = json.Unmarshal(body, &result)
-	if err != nil {
-		return "", err
+	success := m["created"].(bool)
+	if !success {
+		return fmt.Errorf("Unfortunately, this nickname is already taken.")
+	} else {
+		return nil
 	}
-	return result, err
 }
