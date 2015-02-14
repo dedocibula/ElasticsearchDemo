@@ -47,7 +47,7 @@ func (e ELKManager) LiteralSearchELK(index, _type string) (int, error) {
 	return e.parseQueryResult(result)
 }
 
-func (e ELKManager) ExistsRecordELK(index, _type string, record ELKRecord) (bool, error) {
+func (e ELKManager) ExistsRecordELK(index, _type, name string) (bool, error) {
 	err := e.validateParams(index, _type)
 	if err != nil {
 		return false, err
@@ -58,7 +58,7 @@ func (e ELKManager) ExistsRecordELK(index, _type string, record ELKRecord) (bool
 		return false, err
 	}
 
-	id := fmt.Sprintf("%s%s", UIDPrefix, record.Nickname)
+	id := fmt.Sprintf("%s%s", UIDPrefix, name)
 
 	return e.conn.ExistsBool(index, _type, id, nil)
 }
@@ -135,7 +135,7 @@ func (e ELKManager) verifySuccess(result []byte) error {
 
 	success := m["created"].(bool)
 	if !success {
-		return fmt.Errorf("Unfortunately, this nickname is already taken.")
+		return fmt.Errorf("Could not create a record")
 	} else {
 		return nil
 	}

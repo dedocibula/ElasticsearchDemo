@@ -11,8 +11,8 @@ type Lesson struct {
 }
 
 type Result struct {
-	Ok      bool
-	Message string
+	Ok       bool
+	Messages []string
 }
 
 type ELKRecord struct {

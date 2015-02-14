@@ -39,8 +39,11 @@ func (c Quiz) validateAttempt(attempt models.Attempt) {
 	result := qm.Validate(attempt)
 	switch result.Ok {
 	case true:
-		c.Flash.Success(result.Message)
+		c.Flash.Success(result.Messages[0])
 	case false:
-		c.Flash.Error(result.Message)
+		for _, message := range result.Messages {
+			c.Validation.Error(message).Key(message)
+		}
+		c.Validation.Keep()
 	}
 }
