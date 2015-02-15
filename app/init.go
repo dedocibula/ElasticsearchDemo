@@ -1,6 +1,11 @@
 package app
 
-import "github.com/revel/revel"
+import (
+	"fmt"
+	"time"
+
+	"github.com/revel/revel"
+)
 
 func init() {
 	// Filters is the default set of global filters.
@@ -23,6 +28,14 @@ func init() {
 	// ( order dependent )
 	// revel.OnAppStart(InitDB)
 	// revel.OnAppStart(FillCache)
+
+	// Custom template functions
+	revel.TemplateFuncs["add"] = func(a, b int) int { return a + b }
+	revel.TemplateFuncs["time"] = func(date time.Time) string {
+		return fmt.Sprintf("%02d:%02d:%02d %02d.%02d.%d",
+			date.Hour(), date.Minute(), date.Second(),
+			date.Day(), date.Month(), date.Year())
+	}
 }
 
 // TODO turn this into revel.HeaderFilter

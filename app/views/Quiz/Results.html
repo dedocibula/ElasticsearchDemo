@@ -6,14 +6,32 @@
   <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
     <h1 class="emphasized">Quiz Results</h1>
-    <p>
-      <ol>
-        {{range .results}}
-          <li>{{.Nickname}} {{.Timestamp}}</li>
-        {{end}}
+    <div class="row">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nickname</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range $index, $result := .results}}
+            <tr>
+              <th scope="row">{{add $index 1}}</th>
+              <td>{{$result.Nickname}}</td>
+              <td>{{time $result.Timestamp}}</td>
+            </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
       </ol>
     <p>
   </div>
+
+  
+</table>
 
   {{template "extra-content.html" .}}
 
