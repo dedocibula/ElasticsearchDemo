@@ -24,3 +24,7 @@ type Attempt struct {
 	Name   string
 	Answer int
 }
+
+type Subscription struct {
+	New chan ELKRecord
+}
