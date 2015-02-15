@@ -82,6 +82,29 @@ func (e ELKManager) RecordSuccessELK(index, _type string, record ELKRecord) erro
 	return e.verifySuccess(result)
 }
 
+func (e ELKManager) SelectRecordsELK(index, _type string) ([]ELKRecord, error) {
+	err := e.validateParams(index, _type)
+	if err != nil {
+		return nil, err
+	}
+
+	err = e.initialize()
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := elastigo.Search(index).Type(_type).Pretty().Query(
+		elastigo.Query().All(),
+	).Sort(
+		elastigo.Sort("Timestamp").Asc(),
+	).Result(e.conn)
+	if err != nil {
+		return nil, err
+	}
+
+	return e.buildELKRecords(result)
+}
+
 func (e *ELKManager) initialize() error {
 	if e.rm == nil {
 		return fmt.Errorf("ResourceManager isn't initialized")
@@ -139,4 +162,19 @@ func (e ELKManager) verifySuccess(result []byte) error {
 	} else {
 		return nil
 	}
+}
+
+func (e ELKManager) buildELKRecords(result *elastigo.SearchResult) ([]ELKRecord, error) {
+	var ers []ELKRecord
+	if len(result.Hits.Hits) > 0 {
+		for _, hit := range result.Hits.Hits {
+			var er ELKRecord
+			err := json.Unmarshal(*hit.Source, &er)
+			if err != nil {
+				return nil, err
+			}
+			ers = append(ers, er)
+		}
+	}
+	return ers, nil
 }

@@ -36,6 +36,15 @@ func (q *QuizManager) Validate(attempt Attempt) Result {
 	}
 }
 
+func (q QuizManager) GetResults() []ELKRecord {
+	records, err := q.em.SelectRecordsELK(index, rankingType)
+	if err != nil {
+		return make([]ELKRecord, 0)
+	} else {
+		return records
+	}
+}
+
 func (q QuizManager) validateAsync(attempt Attempt) chan Result {
 	in := make(chan Result, len(q.validations))
 	out := make(chan Result, 1)
