@@ -1,5 +1,9 @@
+h2 {
+	font-size: 49px;
+}
+
 .emphasized {
-  color: cadetblue !important;
+	color: cadetblue !important;
 }
 
 .min-button {

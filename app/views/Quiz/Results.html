@@ -1,37 +1,48 @@
-{{set . "title" "Quiz"}}
+{{set . "title" "Results"}}
 {{template "header.html" .}}
 
 <div class="container theme-showcase" role="main">
 
   <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
-    <h1 class="emphasized">Quiz Results</h1>
-    <div class="row">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nickname</th>
-            <th>Timestamp</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{range $index, $result := .results}}
-            <tr>
-              <th scope="row">{{add $index 1}}</th>
-              <td>{{$result.Nickname}}</td>
-              <td>{{time $result.Timestamp}}</td>
-            </tr>
-          {{end}}
-        </tbody>
-      </table>
+    <div class="row text-center">
+      <h2 class="emphasized">Quiz Results</h2>
     </div>
-      </ol>
-    <p>
+    {{with .results}}
+      <div class="row text-center">
+        <p>And here are successful quiz takers. Congratulations to everyone...</p>
+      </div>
+      <div class="row">&nbsp;</div>
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="col-md-2">#</th>
+                <th class="col-md-5">Nickname</th>
+                <th class="col-md-5">Answer Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range $index, $result := .}}
+                <tr>
+                  <th scope="row">{{add $index 1}}</th>
+                  <td>{{$result.Nickname}}</td>
+                  <td>{{time $result.Timestamp}}</td>
+                </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-1"></div>
+      </div>
+    {{else}}
+      <div class="row text-center">
+        <p>Nothing to see here quite yet...</p>
+      </div>
+    {{end}}
   </div>
-
-  
-</table>
 
   {{template "extra-content.html" .}}
 
