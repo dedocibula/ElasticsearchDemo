@@ -6,7 +6,13 @@
   <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
     <h1 class="emphasized">Quiz Results</h1>
-    <p>{{.results}}<p>
+    <p>
+      <ol>
+        {{range .results}}
+          <li>{{.Nickname}} {{.Timestamp}}</li>
+        {{end}}
+      </ol>
+    <p>
   </div>
 
   {{template "extra-content.html" .}}
