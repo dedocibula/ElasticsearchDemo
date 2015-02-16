@@ -4,6 +4,7 @@ import (
 	"ElasticsearchDemo/app/models"
 
 	"github.com/revel/revel"
+	"golang.org/x/net/websocket"
 )
 
 var (
@@ -38,6 +39,18 @@ func (c Quiz) Submit(attempt models.Attempt) revel.Result {
 func (c Quiz) Results() revel.Result {
 	results := qm.GetResults()
 	return c.Render(results)
+}
+
+func (c Quiz) Admin(ws *websocket.Conn) revel.Result {
+	subscription := models.QuizMonitorInstance().Subscribe()
+	defer models.QuizMonitorInstance().Unsubscribe(subscription)
+
+	for {
+		record := <-subscription.New
+		if websocket.JSON.Send(ws, &record) != nil {
+			return nil
+		}
+	}
 }
 
 func (c Quiz) validateAttempt(attempt models.Attempt) {

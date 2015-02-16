@@ -1,6 +1,7 @@
 package app
 
 import (
+	"ElasticsearchDemo/app/models"
 	"fmt"
 	"time"
 
@@ -28,6 +29,7 @@ func init() {
 	// ( order dependent )
 	// revel.OnAppStart(InitDB)
 	// revel.OnAppStart(FillCache)
+	revel.OnAppStart(models.QuizMonitorInstance().Start)
 
 	// Custom template functions
 	revel.TemplateFuncs["add"] = func(a, b int) int { return a + b }
