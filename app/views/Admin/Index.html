@@ -1,0 +1,70 @@
+{{set . "title" "Admin"}}
+{{append . "moreScripts" "js/mustache.min.js"}}
+{{template "header.html" .}}
+
+<div class="container theme-showcase" role="main">
+
+   <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="jumbotron">
+    <div class="row text-center">
+      <h2 class="emphasized">Current Results</h2>
+    </div>
+    <div class="row">&nbsp;</div>
+    <div id="results">
+    <script id="results-template" type="x-tmpl-mustache">
+      [[#if]]
+	    <div class="row">
+	      <div class="col-md-1"></div>
+	      <div class="col-md-10">
+	        <table class="table table-striped">
+	          <thead>
+	            <tr>
+	              <th class="col-md-5">Nickname</th>
+	              <th class="col-md-5">Answer Time</th>
+	            </tr>
+	          </thead>
+              <tbody>
+              [[#results]]
+	            <tr>
+	              <td>[[Nickname]]</td>
+	              <td>[[Timestamp]]</td>
+	            </tr>
+	          [[/results]]
+	          </tbody>
+	        </table>
+	      </div>
+	      <div class="col-md-1"></div>
+        </div>
+      [[/if]]
+      [[^results]]
+        <div class="row text-center">
+          <p>No results</p>
+        </div>
+      [[/results]]
+    </script>
+    </div>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+  (function() {
+  	Mustache.tags = ['[[', ']]'];
+  	var template = $('#results-template').html();
+  	Mustache.parse(template);
+  	$.ajax({ url: '/Admin/ResultEndpoint', dataType: 'json' }).done(function(data) {
+  		var results;
+  		if (data)
+  			results = { 
+  				'results': data, 
+  				'if': function() {
+  					return function(text, render) {
+  						return render(text);
+  					}
+  				} 
+  			};
+  		var rendered = Mustache.render(template, results);
+  		$('#results').html(rendered);
+  	});
+  })();
+</script>
