@@ -10,6 +10,7 @@
       <h2 class="emphasized">Current Results</h2>
     </div>
     <div class="row">&nbsp;</div>
+    {{template "flash.html" .}}
     <div id="results">
     <script id="results-template" type="x-tmpl-mustache">
       [[#if]]
@@ -43,6 +44,13 @@
       [[/results]]
     </script>
     </div>
+    <div class="row">&nbsp;</div>
+    <div class="row">
+      <div class="col-md-10"></div>
+      <div class="col-md-2">
+      	<a id="clearBtn" href="/Admin/ClearResults" class="btn btn-lg btn-success" disabled="disabled">Clear Results</a>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -50,19 +58,26 @@
 <script type="text/javascript">
   (function() {
   	Mustache.tags = ['[[', ']]'];
+  	var clearBtn = $('#clearBtn');
+  	clearBtn.on('click', function() {
+  		clearBtn.attr('disabled', 'disabled');
+  	});
+
   	var template = $('#results-template').html();
   	Mustache.parse(template);
   	$.ajax({ url: '/Admin/ResultEndpoint', dataType: 'json' }).done(function(data) {
   		var results;
-  		if (data)
+  		if (data.length > 0) {
   			results = { 
   				'results': data, 
   				'if': function() {
   					return function(text, render) {
-  						return render(data.length > 0 ? text : null);
+  						return render(text);
   					}
   				} 
   			};
+  			clearBtn.removeAttr('disabled');
+  		}
   		var rendered = Mustache.render(template, results);
   		$('#results').html(rendered);
   	});

@@ -45,6 +45,11 @@ func (q QuizManager) GetResults() []ELKRecord {
 	}
 }
 
+func (q QuizManager) ClearResults() bool {
+	err := q.em.ClearTypeELK(index, rankingType)
+	return err == nil
+}
+
 func (q QuizManager) validateAsync(attempt Attempt) chan Result {
 	in := make(chan Result, len(q.validations))
 	out := make(chan Result, 1)

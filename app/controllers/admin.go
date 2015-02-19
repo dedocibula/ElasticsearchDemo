@@ -15,6 +15,15 @@ func (c Admin) Index() revel.Result {
 	return c.Render()
 }
 
+func (c Admin) ClearResults() revel.Result {
+	qm := models.NewQuizManager()
+	if !qm.ClearResults() {
+		c.Flash.Error("Couldn't clear the results. Please, perform manually.")
+		c.FlashParams()
+	}
+	return c.Redirect(Admin.Index)
+}
+
 func (c Admin) ResultEndpoint() revel.Result {
 	qm := models.NewQuizManager()
 	results := qm.GetResults()

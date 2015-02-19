@@ -79,7 +79,7 @@ func (e ELKManager) RecordSuccessELK(index, _type string, record ELKRecord) erro
 		return err
 	}
 
-	return e.verifySuccess(result)
+	return e.verifySuccess(result, "created", "Could not create a record")
 }
 
 func (e ELKManager) SelectRecordsELK(index, _type string) ([]ELKRecord, error) {
@@ -103,6 +103,25 @@ func (e ELKManager) SelectRecordsELK(index, _type string) ([]ELKRecord, error) {
 	}
 
 	return e.buildELKRecords(result)
+}
+
+func (e ELKManager) ClearTypeELK(index, _type string) error {
+	err := e.validateParams(index)
+	if err != nil {
+		return err
+	}
+
+	err = e.initialize()
+	if err != nil {
+		return err
+	}
+
+	result, err := e.tryClear(index, _type)
+	if err != nil {
+		return err
+	}
+
+	return e.verifySuccess(result, "acknowledged", "Could not clear records")
 }
 
 func (e *ELKManager) initialize() error {
@@ -149,16 +168,22 @@ func (e ELKManager) tryInsert(index, _type string, record ELKRecord) ([]byte, er
 	return e.conn.DoCommand("POST", url, nil, record)
 }
 
-func (e ELKManager) verifySuccess(result []byte) error {
+func (e ELKManager) tryClear(index, _type string) ([]byte, error) {
+	url := fmt.Sprintf("/%s/%s", index, _type)
+
+	return e.conn.DoCommand("DELETE", url, nil, nil)
+}
+
+func (e ELKManager) verifySuccess(result []byte, field, errMessage string) error {
 	var m map[string]interface{}
 	err := json.Unmarshal(result, &m)
 	if err != nil {
 		return err
 	}
 
-	success := m["created"].(bool)
+	success := m[field].(bool)
 	if !success {
-		return fmt.Errorf("Could not create a record")
+		return fmt.Errorf(errMessage)
 	} else {
 		return nil
 	}
