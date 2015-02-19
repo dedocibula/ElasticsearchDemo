@@ -38,7 +38,7 @@
       [[/if]]
       [[^results]]
         <div class="row text-center">
-          <p>No results</p>
+          <p>No results found</p>
         </div>
       [[/results]]
     </script>
@@ -59,7 +59,7 @@
   				'results': data, 
   				'if': function() {
   					return function(text, render) {
-  						return render(text);
+  						return render(data.length > 0 ? text : null);
   					}
   				} 
   			};
