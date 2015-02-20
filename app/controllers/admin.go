@@ -3,8 +3,8 @@ package controllers
 import (
 	"ElasticsearchDemo/app/models"
 
+	"code.google.com/p/go.net/websocket"
 	"github.com/revel/revel"
-	"golang.org/x/net/websocket"
 )
 
 type Admin struct {
@@ -30,14 +30,15 @@ func (c Admin) ResultEndpoint() revel.Result {
 	return c.RenderJson(results)
 }
 
-func (c Admin) RecordEndpoint(ws *websocket.Conn) revel.Result {
+func (c Admin) AttemptEndpoint(ws *websocket.Conn) revel.Result {
 	subscription := models.QuizMonitorInstance().Subscribe()
 	defer models.QuizMonitorInstance().Unsubscribe(subscription)
 
 	for {
-		record := <-subscription.New
-		if websocket.JSON.Send(ws, &record) != nil {
+		attempt := <-subscription.New
+		if websocket.JSON.Send(ws, &attempt) != nil {
 			return nil
 		}
 	}
+	return nil
 }

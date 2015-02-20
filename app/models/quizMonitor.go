@@ -14,7 +14,7 @@ type QuizMonitor struct {
 
 	subscribeChannel   chan (chan Subscription)
 	unsubscribeChannel chan Subscription
-	publishChannel     chan ELKRecord
+	publishChannel     chan Attempt
 
 	controlChannel chan struct{}
 }
@@ -28,7 +28,7 @@ func QuizMonitorInstance() *QuizMonitor {
 
 		q.subscribeChannel = make(chan (chan Subscription), channelSize)
 		q.unsubscribeChannel = make(chan Subscription, channelSize)
-		q.publishChannel = make(chan ELKRecord, channelSize)
+		q.publishChannel = make(chan Attempt, channelSize)
 		q.controlChannel = make(chan struct{}, 1)
 
 		quizMonitor = q
@@ -54,8 +54,8 @@ func (q *QuizMonitor) Subscribe() Subscription {
 	return <-subscription
 }
 
-func (q *QuizMonitor) Publish(record ELKRecord) {
-	q.publishChannel <- record
+func (q *QuizMonitor) Publish(attempt Attempt) {
+	q.publishChannel <- attempt
 }
 
 func (q *QuizMonitor) Unsubscribe(subscription Subscription) {
@@ -71,15 +71,15 @@ func (q *QuizMonitor) start() {
 	for {
 		select {
 		case s := <-q.subscribeChannel:
-			subscriber := make(chan ELKRecord)
+			subscriber := make(chan Attempt, channelSize)
 			for a := q.archive.Front(); a != nil; a = a.Next() {
-				subscriber <- a.Value.(ELKRecord)
+				subscriber <- a.Value.(Attempt)
 			}
 			q.subscribers.PushBack(subscriber)
 			s <- Subscription{New: subscriber}
 		case r := <-q.publishChannel:
 			for s := q.subscribers.Front(); s != nil; s = s.Next() {
-				s.Value.(chan ELKRecord) <- r
+				s.Value.(chan Attempt) <- r
 			}
 			if q.archive.Len() > channelSize {
 				q.archive.Remove(q.archive.Front())
@@ -87,7 +87,7 @@ func (q *QuizMonitor) start() {
 			q.archive.PushBack(r)
 		case u := <-q.unsubscribeChannel:
 			for s := q.subscribers.Front(); s != nil; s = s.Next() {
-				if s.Value.(chan ELKRecord) == u.New {
+				if s.Value.(chan Attempt) == u.New {
 					q.subscribers.Remove(s)
 					break
 				}
@@ -98,7 +98,7 @@ func (q *QuizMonitor) start() {
 	}
 }
 
-func (q QuizMonitor) drain(ch chan ELKRecord) {
+func (q QuizMonitor) drain(ch chan Attempt) {
 	for {
 		defer close(ch)
 		select {

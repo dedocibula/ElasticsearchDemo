@@ -26,5 +26,5 @@ type Attempt struct {
 }
 
 type Subscription struct {
-	New chan ELKRecord
+	New chan Attempt
 }

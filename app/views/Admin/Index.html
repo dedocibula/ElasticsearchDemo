@@ -9,17 +9,18 @@
     <div class="row text-center">
       <h2 class="emphasized">Current Results</h2>
     </div>
-    <div class="row">&nbsp;</div>
     {{template "flash.html" .}}
     <div id="results">
     <script id="results-template" type="x-tmpl-mustache">
       [[#if]]
+      	<div class="row">&nbsp;</div>
 	    <div class="row">
 	      <div class="col-md-1"></div>
 	      <div class="col-md-10">
 	        <table class="table table-striped">
 	          <thead>
 	            <tr>
+	              <th class="col-md-2">#</th>
 	              <th class="col-md-5">Nickname</th>
 	              <th class="col-md-5">Answer Time</th>
 	            </tr>
@@ -27,6 +28,7 @@
               <tbody>
               [[#results]]
 	            <tr>
+	              <th scope="row">[[Index]]</th>
 	              <td>[[Nickname]]</td>
 	              <td>[[Timestamp]]</td>
 	            </tr>
@@ -53,6 +55,38 @@
     </div>
   </div>
 
+  <div class="row">
+    <div class="col-md-6">
+      <div class="page-header text-center">
+    	<h1 class="emphasized">All attempts</h1>
+      </div>
+      <div class="jumbotron">
+        <div class="row">
+          <div class="col-md-1"></div>
+          <div class="col-md-10">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="col-md-6">Name</th>
+                  <th class="col-md-6">Answer</th>
+                </tr>
+              </thead>
+              <tbody id="attempts">
+              <script id="attempt-template" type="x-tmpl-mustache">
+                <tr>
+                  <td>[[Name]]</td>
+                  <td>[[Answer]]</td>
+                </tr>
+              </script>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-md-1"></div>
+      	</div>
+      </div>
+    </div>
+  </div>
+
 </div> <!-- /container -->
 
 {{template "footer.html" .}}
@@ -65,13 +99,16 @@
   		clearBtn.attr('disabled', 'disabled');
   	});
 
-  	var template = $('#results-template').html();
-  	Mustache.parse(template);
+  	var resultsTemplate = $('#results-template').html();
+  	Mustache.parse(resultsTemplate);
   	$.ajax({ url: '/Admin/ResultEndpoint', dataType: 'json' }).done(function(data) {
   		var results;
   		if (data.length > 0) {
   			results = { 
-  				'results': data, 
+  				'results': $.map(data, function(doc, index) {
+  					doc['Index'] = index + 1;
+  					return doc;
+  				}), 
   				'if': function() {
   					return function(text, render) {
   						return render(text);
@@ -80,8 +117,18 @@
   			};
   			clearBtn.removeAttr('disabled');
   		}
-  		var rendered = Mustache.render(template, results);
+  		var rendered = Mustache.render(resultsTemplate, results);
   		$('#results').html(rendered);
   	});
+
+  	var attemptTemplate = $('#attempt-template').html();
+  	Mustache.parse(attemptTemplate);
+
+  	var socket = new WebSocket('ws://' + window.location.host + '/Admin/AttemptEndpoint');
+
+  	socket.onmessage = function(attempt) {
+  		var rendered = Mustache.render(attemptTemplate, JSON.parse(attempt.data));
+  		$('#attempts').prepend(rendered);
+  	};
   })();
 </script>
