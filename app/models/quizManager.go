@@ -26,14 +26,14 @@ func (q *QuizManager) Dispose() {
 }
 
 func (q *QuizManager) Validate(attempt Attempt) Result {
-	QuizMonitorInstance().Publish(attempt)
-
 	q.setupValidations()
 	r := q.validateAsync(attempt)
 	if result := <-r; result.Ok {
+		QuizMonitorInstance().Publish(Success, attempt)
 		record := q.createELKRecord(attempt.Name)
 		return q.submitELKRecord(record)
 	} else {
+		QuizMonitorInstance().Publish(Failure, attempt)
 		return result
 	}
 }

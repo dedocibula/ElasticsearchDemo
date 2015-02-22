@@ -25,6 +25,11 @@ type Attempt struct {
 	Answer int
 }
 
+type AttemptWrapper struct {
+	Success bool
+	Attempt Attempt
+}
+
 type Subscription struct {
-	New chan Attempt
+	New chan AttemptWrapper
 }

@@ -55,29 +55,55 @@
     </div>
   </div>
 
+  <script id="attempt-template" type="x-tmpl-mustache">
+    <tr>
+      <td>[[Name]]</td>
+      <td>[[Answer]]</td>
+    </tr>
+  </script>
+
   <div class="row">
     <div class="col-md-6">
       <div class="page-header text-center">
-    	<h1 class="emphasized">All attempts</h1>
+    	<h1 class="emphasized">Failed attempts</h1>
       </div>
       <div class="jumbotron">
         <div class="row">
           <div class="col-md-1"></div>
           <div class="col-md-10">
-            <table class="table table-striped">
+            <table class="table table-striped table-center">
               <thead>
                 <tr>
                   <th class="col-md-6">Name</th>
                   <th class="col-md-6">Answer</th>
                 </tr>
               </thead>
-              <tbody id="attempts">
-              <script id="attempt-template" type="x-tmpl-mustache">
+              <tbody id="failures">
+				<!-- content here -->
+              </tbody>
+            </table>
+          </div>
+          <div class="col-md-1"></div>
+      	</div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="page-header text-center">
+    	<h1 class="emphasized">Successful attempts</h1>
+      </div>
+      <div class="jumbotron">
+        <div class="row">
+          <div class="col-md-1"></div>
+          <div class="col-md-10">
+            <table class="table table-striped table-center">
+              <thead>
                 <tr>
-                  <td>[[Name]]</td>
-                  <td>[[Answer]]</td>
+                  <th class="col-md-6">Name</th>
+                  <th class="col-md-6">Answer</th>
                 </tr>
-              </script>
+              </thead>
+              <tbody id="successes">
+				<!-- content here -->
               </tbody>
             </table>
           </div>
@@ -101,34 +127,50 @@
 
   	var resultsTemplate = $('#results-template').html();
   	Mustache.parse(resultsTemplate);
-  	$.ajax({ url: '/Admin/ResultEndpoint', dataType: 'json' }).done(function(data) {
-  		var results;
-  		if (data.length > 0) {
-  			results = { 
-  				'results': $.map(data, function(doc, index) {
-  					doc['Index'] = index + 1;
-  					return doc;
-  				}), 
-  				'if': function() {
-  					return function(text, render) {
-  						return render(text);
-  					}
-  				} 
-  			};
-  			clearBtn.removeAttr('disabled');
-  		}
-  		var rendered = Mustache.render(resultsTemplate, results);
-  		$('#results').html(rendered);
-  	});
+
+  	function getResults() {
+	  	$.ajax({ url: '/Admin/ResultEndpoint', dataType: 'json' }).done(function(data) {
+	  		var results;
+	  		if (data.length > 0) {
+	  			results = { 
+	  				'results': $.map(data, function(doc, index) {
+	  					doc['Index'] = index + 1;
+	  					return doc;
+	  				}), 
+	  				'if': function() {
+	  					return function(text, render) {
+	  						return render(text);
+	  					}
+	  				} 
+	  			};
+	  			clearBtn.removeAttr('disabled');
+	  		}
+	  		var rendered = Mustache.render(resultsTemplate, results);
+	  		$('#results').html(rendered);
+	  	});
+	}
+
+	function truncate(children, maxCount) {
+		if (children.length > maxCount) {
+			$(children).last().remove();
+		}
+	}
 
   	var attemptTemplate = $('#attempt-template').html();
   	Mustache.parse(attemptTemplate);
 
   	var socket = new WebSocket('ws://' + window.location.host + '/Admin/AttemptEndpoint');
 
-  	socket.onmessage = function(attempt) {
-  		var rendered = Mustache.render(attemptTemplate, JSON.parse(attempt.data));
-  		$('#attempts').prepend(rendered);
+  	socket.onmessage = function(message) {
+  		var m = JSON.parse(message.data);
+  		var rendered = Mustache.render(attemptTemplate, m.Attempt);
+  		var container = m.Success ? $('#successes') : $('#failures');
+  		container.prepend(rendered);
+  		truncate(container.children(), 5);
+  		if (m.Success)
+  			getResults();
   	};
+
+  	getResults();
   })();
 </script>

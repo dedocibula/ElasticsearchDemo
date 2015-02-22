@@ -2,7 +2,11 @@ package models
 
 import "container/list"
 
-const channelSize = 10
+const (
+	ChannelCapacity = 10
+	Success         = "SUCCESS"
+	Failure         = "FAILURE"
+)
 
 var quizMonitor *QuizMonitor
 
@@ -14,7 +18,7 @@ type QuizMonitor struct {
 
 	subscribeChannel   chan (chan Subscription)
 	unsubscribeChannel chan Subscription
-	publishChannel     chan Attempt
+	publishChannel     chan AttemptWrapper
 
 	controlChannel chan struct{}
 }
@@ -26,9 +30,9 @@ func QuizMonitorInstance() *QuizMonitor {
 		q.subscribers = list.New()
 		q.archive = list.New()
 
-		q.subscribeChannel = make(chan (chan Subscription), channelSize)
-		q.unsubscribeChannel = make(chan Subscription, channelSize)
-		q.publishChannel = make(chan Attempt, channelSize)
+		q.subscribeChannel = make(chan (chan Subscription), ChannelCapacity)
+		q.unsubscribeChannel = make(chan Subscription, ChannelCapacity)
+		q.publishChannel = make(chan AttemptWrapper, ChannelCapacity)
 		q.controlChannel = make(chan struct{}, 1)
 
 		quizMonitor = q
@@ -54,8 +58,15 @@ func (q *QuizMonitor) Subscribe() Subscription {
 	return <-subscription
 }
 
-func (q *QuizMonitor) Publish(attempt Attempt) {
-	q.publishChannel <- attempt
+func (q *QuizMonitor) Publish(status string, attempt Attempt) {
+	var wrapper AttemptWrapper
+	switch status {
+	case Success:
+		wrapper = AttemptWrapper{Success: true, Attempt: attempt}
+	case Failure:
+		wrapper = AttemptWrapper{Success: false, Attempt: attempt}
+	}
+	q.publishChannel <- wrapper
 }
 
 func (q *QuizMonitor) Unsubscribe(subscription Subscription) {
@@ -71,23 +82,23 @@ func (q *QuizMonitor) start() {
 	for {
 		select {
 		case s := <-q.subscribeChannel:
-			subscriber := make(chan Attempt, channelSize)
+			subscriber := make(chan AttemptWrapper, ChannelCapacity)
 			for a := q.archive.Front(); a != nil; a = a.Next() {
-				subscriber <- a.Value.(Attempt)
+				subscriber <- a.Value.(AttemptWrapper)
 			}
 			q.subscribers.PushBack(subscriber)
 			s <- Subscription{New: subscriber}
 		case r := <-q.publishChannel:
 			for s := q.subscribers.Front(); s != nil; s = s.Next() {
-				s.Value.(chan Attempt) <- r
+				s.Value.(chan AttemptWrapper) <- r
 			}
-			if q.archive.Len() > channelSize {
+			if q.archive.Len() > ChannelCapacity {
 				q.archive.Remove(q.archive.Front())
 			}
 			q.archive.PushBack(r)
 		case u := <-q.unsubscribeChannel:
 			for s := q.subscribers.Front(); s != nil; s = s.Next() {
-				if s.Value.(chan Attempt) == u.New {
+				if s.Value.(chan AttemptWrapper) == u.New {
 					q.subscribers.Remove(s)
 					break
 				}
@@ -98,7 +109,7 @@ func (q *QuizMonitor) start() {
 	}
 }
 
-func (q QuizMonitor) drain(ch chan Attempt) {
+func (q QuizMonitor) drain(ch chan AttemptWrapper) {
 	for {
 		defer close(ch)
 		select {
