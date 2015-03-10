@@ -119,11 +119,11 @@
 			},
 
 			_afterFetch: function(ok) {
-				if (ok) self._enableClearButton();
+				if (ok) this._enableClearButton();
 			},
 
 			_afterMessage: function(ok) {
-				if (ok) self.fetchResults();
+				if (ok) this.fetchResults();
 			}
 		};
 
