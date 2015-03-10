@@ -13,17 +13,14 @@ type App struct {
 
 const SenseUri = "_plugin/marvel/sense/index.html"
 
-var (
-	rm = models.NewResourceManager()
-	lm = models.NewLessonManager()
-)
-
 func (c App) Index() revel.Result {
+	lm := models.NewLessonManager()
 	lessons := lm.GenerateLessons()
 	return c.Render(lessons)
 }
 
 func (c App) Sense() revel.Result {
+	rm := models.NewResourceManager()
 	senseUrl := fmt.Sprintf("http://%s:%s/%s",
 		rm.GetELKAddress(),
 		rm.GetELKPort(),
@@ -32,6 +29,7 @@ func (c App) Sense() revel.Result {
 }
 
 func (c App) Lesson(id int) revel.Result {
+	rm := models.NewResourceManager()
 	str, err := rm.LoadMaterial(id)
 	if err != nil {
 		return c.NotFound("Couldn't find specified file")

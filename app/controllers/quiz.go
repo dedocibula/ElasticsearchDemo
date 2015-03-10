@@ -6,10 +6,6 @@ import (
 	"github.com/revel/revel"
 )
 
-var (
-	qm = models.NewQuizManager()
-)
-
 type Quiz struct {
 	*revel.Controller
 }
@@ -36,11 +32,13 @@ func (c Quiz) Submit(attempt models.Attempt) revel.Result {
 }
 
 func (c Quiz) Results() revel.Result {
+	qm := models.NewQuizManager()
 	results := qm.GetResults()
 	return c.Render(results)
 }
 
 func (c Quiz) validateAttempt(attempt models.Attempt) {
+	qm := models.NewQuizManager()
 	result := qm.Validate(attempt)
 	switch result.Ok {
 	case true:
