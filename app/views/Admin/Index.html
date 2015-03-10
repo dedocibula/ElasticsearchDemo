@@ -1,5 +1,6 @@
 {{set . "title" "Admin"}}
 {{append . "moreScripts" "js/mustache.min.js"}}
+{{append . "moreScripts" "js/script.js"}}
 {{template "header.html" .}}
 
 <div class="container theme-showcase" role="main">
@@ -116,61 +117,3 @@
 </div> <!-- /container -->
 
 {{template "footer.html" .}}
-
-<script type="text/javascript">
-  (function() {
-  	Mustache.tags = ['[[', ']]'];
-  	var clearBtn = $('#clearBtn');
-  	clearBtn.on('click', function() {
-  		clearBtn.attr('disabled', 'disabled');
-  	});
-
-  	var resultsTemplate = $('#results-template').html();
-  	Mustache.parse(resultsTemplate);
-
-  	function getResults() {
-	  	$.ajax({ url: '/Admin/ResultEndpoint', dataType: 'json' }).done(function(data) {
-	  		var results;
-	  		if (data.length > 0) {
-	  			results = { 
-	  				'results': $.map(data, function(doc, index) {
-	  					doc['Index'] = index + 1;
-	  					return doc;
-	  				}), 
-	  				'if': function() {
-	  					return function(text, render) {
-	  						return render(text);
-	  					}
-	  				} 
-	  			};
-	  			clearBtn.removeAttr('disabled');
-	  		}
-	  		var rendered = Mustache.render(resultsTemplate, results);
-	  		$('#results').html(rendered);
-	  	});
-	}
-
-	function truncate(children, maxCount) {
-		if (children.length > maxCount) {
-			$(children).last().remove();
-		}
-	}
-
-  	var attemptTemplate = $('#attempt-template').html();
-  	Mustache.parse(attemptTemplate);
-
-  	var socket = new WebSocket('ws://' + window.location.host + '/Admin/AttemptEndpoint');
-
-  	socket.onmessage = function(message) {
-  		var m = JSON.parse(message.data);
-  		var rendered = Mustache.render(attemptTemplate, m.Attempt);
-  		var container = m.Success ? $('#successes') : $('#failures');
-  		container.prepend(rendered);
-  		truncate(container.children(), 5);
-  		if (m.Success)
-  			getResults();
-  	};
-
-  	getResults();
-  })();
-</script>
