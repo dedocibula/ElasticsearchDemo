@@ -1,3 +1,12 @@
 # Welcome to Elasticsearch Demo
 
-This is a short demo web application written in Google Golang Revel MVC framework. The purpose of this application is to showcase the basics of Elasticsearch. The tutorial takes you through some fundamental as well as some more advanced operations.
+Elasticsearch Demo is a short web application written in Revel - Golang MVC framework - serving as a tutorial for Elasticsearch. The tutorial encapsulates the most fundamental as well as some more advanced operations. The application itself is composed of several very intuitive lessons and a final quiz. It runs against live ELK cluster and makes use of Javascript Sense interface to query the cluster.
+
+Used technologies
+-----------------
+- Elasticsearch / Kibana
+- Revel
+- Elastigo
+- Bootstrap
+- Moustache
+- WebSockets
