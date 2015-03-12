@@ -64,54 +64,32 @@
   </script>
 
   <div class="row">
-    <div class="col-md-6">
-      <div class="page-header text-center">
-    	<h1 class="emphasized">Failed attempts</h1>
-      </div>
-      <div class="jumbotron">
-        <div class="row">
-          <div class="col-md-1"></div>
-          <div class="col-md-10">
-            <table class="table table-striped table-center">
-              <thead>
-                <tr>
-                  <th class="col-md-6">Name</th>
-                  <th class="col-md-6">Answer</th>
-                </tr>
-              </thead>
-              <tbody id="failures">
-				<!-- content here -->
-              </tbody>
-            </table>
-          </div>
-          <div class="col-md-1"></div>
-      	</div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="page-header text-center">
-    	<h1 class="emphasized">Successful attempts</h1>
-      </div>
-      <div class="jumbotron">
-        <div class="row">
-          <div class="col-md-1"></div>
-          <div class="col-md-10">
-            <table class="table table-striped table-center">
-              <thead>
-                <tr>
-                  <th class="col-md-6">Name</th>
-                  <th class="col-md-6">Answer</th>
-                </tr>
-              </thead>
-              <tbody id="successes">
-				<!-- content here -->
-              </tbody>
-            </table>
-          </div>
-          <div class="col-md-1"></div>
-      	</div>
-      </div>
-    </div>
+  	{{range $attemptField := .attemptFields}}
+	  <div class="col-md-6">
+	    <div class="page-header text-center">
+	  	  <h1 class="emphasized">{{$attemptField.Header}}</h1>
+	    </div>
+	    <div class="jumbotron">
+	      <div class="row">
+	        <div class="col-md-1"></div>
+	        <div class="col-md-10">
+	          <table class="table table-striped table-center">
+	            <thead>
+	              <tr>
+	                <th class="col-md-6">Name</th>
+	                <th class="col-md-6">Answer</th>
+	              </tr>
+	            </thead>
+	            <tbody id="{{$attemptField.Id}}">
+				  <!-- content here -->
+	            </tbody>
+	          </table>
+	        </div>
+	        <div class="col-md-1"></div>
+	      </div>
+	    </div>
+	  </div>
+	{{end}}
   </div>
 
 </div> <!-- /container -->

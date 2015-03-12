@@ -12,7 +12,8 @@ type Admin struct {
 }
 
 func (c Admin) Index() revel.Result {
-	return c.Render()
+	attemptFields := models.UIHelperInstance().GenerateAttemptFields()
+	return c.Render(attemptFields)
 }
 
 func (c Admin) ClearResults() revel.Result {

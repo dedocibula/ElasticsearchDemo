@@ -33,3 +33,8 @@ type AttemptWrapper struct {
 type Subscription struct {
 	New chan AttemptWrapper
 }
+
+type AttemptField struct {
+	Id     string
+	Header string
+}
