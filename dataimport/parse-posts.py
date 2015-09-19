@@ -3,22 +3,24 @@
 import re
 from functools import partial
 from lxml import etree
-from parse import fastiter
-from parse import es
+from elasticsearch import Elasticsearch
 
 
 INDEX = 'dba'
 QUESTION_TYPE = 'question'
 ANSWER_TYPE = 'answer'
-INPUT_POSTS = ('./stackexchange/dba.stackexchange.com/Posts.xml')
-INPUT_USERS = ('./stackexchange/dba.stackexchange.com/Users.xml')
-INPUT_COMMENTS = ('./stackexchange/dba.stackexchange.com/Comments.xml')
+INPUT_POSTS = ('./dba.stackexchange.com/Posts.xml')
+INPUT_USERS = ('./dba.stackexchange.com/Users.xml')
+INPUT_COMMENTS = ('./dba.stackexchange.com/Comments.xml')
 
 
 def parse_tags(input):
     p = re.compile(r'<(.*?)>')
     return p.findall(input)
 
+def fastiter(context, process_func):
+    for action, elem in context:
+        process_func(elem);
 
 # put mapping
 question_mapping = {
@@ -85,6 +87,7 @@ answer_mapping = {
     }
 }
 
+es = Elasticsearch()
 es.indices.delete(index=INDEX, ignore=[404, 400])
 es.indices.create(index=INDEX)
 es.indices.put_mapping(index=INDEX, doc_type=QUESTION_TYPE,
