@@ -4,6 +4,7 @@ import re
 from functools import partial
 from lxml import etree
 from elasticsearch import Elasticsearch
+from multiprocessing.pool import ThreadPool as Pool
 
 
 INDEX = 'dba'
@@ -18,9 +19,10 @@ def parse_tags(input):
     p = re.compile(r'<(.*?)>')
     return p.findall(input)
 
+pool = Pool(10)
 def fastiter(context, process_func):
     for action, elem in context:
-        process_func(elem);
+        pool.apply_async(process_func, (elem,))
 
 # put mapping
 question_mapping = {
@@ -184,3 +186,6 @@ fastiter(context, partial(process_questions, answers, users, comments))
 
 context = etree.iterparse(INPUT_POSTS, tag='row')
 fastiter(context, partial(process_answers, answers, users, comments))
+
+pool.close()
+pool.join()
