@@ -3,8 +3,8 @@ package controllers
 import (
 	"ElasticsearchDemo/app/models"
 
-	"code.google.com/p/go.net/websocket"
 	"github.com/revel/revel"
+	"golang.org/x/net/websocket"
 )
 
 type Admin struct {
